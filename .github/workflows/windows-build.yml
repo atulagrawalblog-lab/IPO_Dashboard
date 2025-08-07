@@ -1,0 +1,27 @@
+name: Build IPO Dashboard
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile resources
+        run: rc /fo Resources.res Resources.rc
+
+      - name: Build with MSVC
+        run: cl /DUNICODE /D_UNICODE main.cpp UI.cpp Logic.cpp Theme.cpp Settings.cpp Resources.res /Fe:IPO_Dashboard.exe /link gdiplus.lib comctl32.lib
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: IPO_Dashboard
+          path: IPO_Dashboard.exe
