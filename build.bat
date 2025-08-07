@@ -1,36 +1,34 @@
 @echo off
-REM build.bat - builds IPO_Dashboard.exe using MSVC Build Tools if available, otherwise tries MinGW
+setlocal
 
-set EXE_NAME=IPO_Dashboard.exe
+REM ===============================
+REM IPO Dashboard Local Build Script
+REM ===============================
 
-REM Check for MSVC environment by looking for cl.exe in PATH
-where cl >nul 2>nul
-if %ERRORLEVEL% == 0 (
-    echo Found MSVC (cl). Building with MSVC...
-    rc /fo Resources.res Resources.rc
-    cl /DUNICODE /D_UNICODE main.cpp UI.cpp Logic.cpp Theme.cpp Settings.cpp Resources.res /Fe:%EXE_NAME% /link gdiplus.lib comctl32.lib
-    if %ERRORLEVEL% == 0 (
-        echo Build succeeded.
-        start "" "%EXE_NAME%"
-        exit /b 0
-    ) else (
-        echo MSVC build failed.
-    )
-) 
-
-REM Try MinGW g++
-where g++ >nul 2>nul
-if %ERRORLEVEL% == 0 (
-    echo Found g++. Building with MinGW...
-    g++ -municode main.cpp UI.cpp Logic.cpp Theme.cpp Settings.cpp -o %EXE_NAME% -lgdi32 -lcomctl32
-    if %ERRORLEVEL% == 0 (
-        echo Build succeeded.
-        start "" "%EXE_NAME%"
-        exit /b 0
-    ) else (
-        echo MinGW build failed.
-    )
+REM Compile resources (icon + manifest)
+rc /fo Resources.res Resources.rc
+if errorlevel 1 (
+    echo Resource compilation failed.
+    pause
+    exit /b 1
 )
 
-echo No supported compiler found in PATH. Install MSVC Build Tools or MinGW and re-run build.bat.
-pause
+REM Compile and link (Unicode + required Windows libs)
+cl /DUNICODE /D_UNICODE main.cpp UI.cpp Logic.cpp Theme.cpp Settings.cpp Resources.res ^
+/Fe:IPO_Dashboard.exe ^
+/link user32.lib gdi32.lib comctl32.lib gdiplus.lib advapi32.lib ole32.lib
+if errorlevel 1 (
+    echo Build failed.
+    pause
+    exit /b 1
+)
+
+REM Launch the application
+if exist IPO_Dashboard.exe (
+    echo Build successful! Launching IPO_Dashboard.exe...
+    start "" IPO_Dashboard.exe
+) else (
+    echo EXE not found after build.
+)
+
+endlocal
