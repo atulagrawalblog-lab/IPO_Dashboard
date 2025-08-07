@@ -1,2 +1,7 @@
-#include "manifest.xml"
+// Resources.rc - resources for IPO_Dashboard
+
+// Embed application manifest
+1 RT_MANIFEST "manifest.xml"
+
+// Embed application icon
 IDI_APP_ICON ICON "app.ico"
