@@ -17,6 +17,7 @@ REM Compile and link (Unicode + required Windows libs)
 cl /DUNICODE /D_UNICODE main.cpp UI.cpp Logic.cpp Theme.cpp Settings.cpp Resources.res ^
 /Fe:IPO_Dashboard.exe ^
 /link user32.lib gdi32.lib comctl32.lib gdiplus.lib advapi32.lib ole32.lib
+
 if errorlevel 1 (
     echo Build failed.
     pause
